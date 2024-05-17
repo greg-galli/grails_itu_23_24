@@ -16,4 +16,8 @@ class Comment {
         author nullable: false
         post nullable: false
     }
+
+    static mapping = {
+        content type: 'text'
+    }
 }
