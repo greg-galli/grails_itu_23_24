@@ -141,8 +141,3 @@ environments:
                 testOnReturn: false
                 jdbcInterceptors: ConnectionState
                 defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
-server:
-    port: 8081
-illustrations:
-    path: C:/Users/gregg/IdeaProjects/grails_itu_23_24/grails-app/assets/images/
-    url: http://localhost:8081/assets/

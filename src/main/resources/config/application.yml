@@ -1,0 +1,7 @@
+# Ceci devra contenir votre configuration personnelle
+# Ce fichier ne devrait pas être ajouté à git car chacun devra conserver sa propre configuration concernant les chemins pour stocker les fichiers
+server:
+  port: 8082
+illustrations:
+  path: C:/Users/gregg/IdeaProjects/grails_itu_23_24/grails-app/assets/images/
+  url: http://localhost:8082/assets/
