@@ -16,16 +16,19 @@ class BootStrap {
         UserRole.withTransaction {
             // On crée un rôle admin que l'on attribuera après aux utilisateurs
             def adminRole = new Role(authority: 'ROLE_ADMIN').save()
+            def userRole = new Role(authority: 'ROLE_USER').save()
             // On crée un compte utilisateur
             def adminUser = new User(username: 'admin', password: 'admin').save()
+            def userUser = new User(username: 'user', password: 'user').save()
 
             // On attribue le role (ROLE_ADMIN) à l'utilisateur
             UserRole.create(adminUser, adminRole)
+            UserRole.create(userUser, userRole)
         }
 
-        assert User.count() == 1
-        assert Role.count() == 1
-        assert UserRole.count() == 1
+        assert User.count() == 2
+        assert Role.count() == 2
+        assert UserRole.count() == 2
 
         Tag.withTransaction {
             // On ajoute 3 tags que l'on va réutiliser ensuite dans les post
@@ -41,6 +44,7 @@ class BootStrap {
 
             // On recharche l'utilisateur créé car défini dans une autre transaction
             def adminUser = User.get(1)
+            def userUser = User.get(2)
 
             // On ajoute 5 posts à l'utilisateur
             (1..5).each {
@@ -70,6 +74,36 @@ class BootStrap {
                      *          Qui sauvegarde les commentaires et les fichiers
                      */
                     adminUser.save()
+            }
+
+            // On ajoute 5 posts à l'utilisateur
+            (1..5).each {
+                Integer postIdx ->
+                    // Information sur le post
+                    def postInstance = new Post(title: "Titre du Post $postIdx", content: "Quelque chose")
+                    // On ajoute un fichier au post
+                    postInstance.file = new File(name: "grails.svg")
+
+                    // On ajoute tous les tags existant au post
+                    Tag.list().each {
+                        postInstance.addToTags(it)
+                    }
+
+                    // On ajoute 5 commentaires au post ainsi qu'à l'utilisateur
+                    (1..5).each {
+                        def commentInstance = new Comment(content: "Super commentaire plein de positivité")
+                        postInstance.addToComments(commentInstance)
+                        userUser.addToComments(commentInstance)
+                    }
+
+                    // On ajoute le post à la liste des posts de l'utilisateur
+                    userUser.addToPosts(postInstance)
+                    /**
+                     *  On sauvegarde l'utilisateur
+                     *      Qui sauvegarde les posts
+                     *          Qui sauvegarde les commentaires et les fichiers
+                     */
+                    userUser.save()
             }
         }
 

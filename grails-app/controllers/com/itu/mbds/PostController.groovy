@@ -1,17 +1,27 @@
 package com.itu.mbds
 
+import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 
+@Secured(['ROLE_ADMIN', 'ROLE_USER'])
 class PostController {
 
     PostService postService
+    SpringSecurityService springSecurityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
+        User userInstance = (User) springSecurityService.getCurrentUser()
+        def postList
+        if (userInstance.getAuthorities().contains(Role.findByAuthority('ROLE_USER')))
+            postList = Post.findAllByAuthor(userInstance)
+        else
+            postList = postService.list(params)
         params.max = Math.min(max ?: 10, 100)
-        respond postService.list(params), model:[postCount: postService.count()]
+        respond postList, model: [postCount: postService.count()]
     }
 
     def show(Long id) {
@@ -31,7 +41,7 @@ class PostController {
         try {
             postService.save(post)
         } catch (ValidationException e) {
-            respond post.errors, view:'create'
+            respond post.errors, view: 'create'
             return
         }
 
@@ -57,7 +67,7 @@ class PostController {
         try {
             postService.save(post)
         } catch (ValidationException e) {
-            respond post.errors, view:'edit'
+            respond post.errors, view: 'edit'
             return
         }
 
@@ -66,7 +76,7 @@ class PostController {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'post.label', default: 'Post'), post.id])
                 redirect post
             }
-            '*'{ respond post, [status: OK] }
+            '*' { respond post, [status: OK] }
         }
     }
 
@@ -81,9 +91,9 @@ class PostController {
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.deleted.message', args: [message(code: 'post.label', default: 'Post'), id])
-                redirect action:"index", method:"GET"
+                redirect action: "index", method: "GET"
             }
-            '*'{ render status: NO_CONTENT }
+            '*' { render status: NO_CONTENT }
         }
     }
 
@@ -93,7 +103,7 @@ class PostController {
                 flash.message = message(code: 'default.not.found.message', args: [message(code: 'post.label', default: 'Post'), params.id])
                 redirect action: "index", method: "GET"
             }
-            '*'{ render status: NOT_FOUND }
+            '*' { render status: NOT_FOUND }
         }
     }
 }
