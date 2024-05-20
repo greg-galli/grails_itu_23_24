@@ -64,8 +64,6 @@ Vous devrez produire une API REST répondant aux requêtes suivantes :
 - GET, POST sur /api/users
 - GET, PUT, PATCH et DELETE sur /api/post/{id}
 - GET, POST sur /api/posts
-- GET, PUT, PATCH et DELETE sur /api/album/{id}
-- GET, POST sur /api/albums
 - GET, PUT, PATCH et DELETE sur /api/comment/{id}
 - GET, POST sur /api/comments
 - GET, PUT, PATCH et DELETE sur /api/tag/{id}
